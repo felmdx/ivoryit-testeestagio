@@ -19,3 +19,14 @@
 
     ***A cada casa aberta aumenta 1 na var casas_abertas e bombas_marcadas, se o valor for igual ant no inicio do loop
         Abre o primeiro '-' que aparecer e repete. 
+
+
+        i - 1, j
+        i + 1, j
+        i, j - 1
+        i, j + 1
+
+        i - 1, j - 1
+        i - 1, j + 1
+        i + 1, j - 1
+        i + 1, j + 1
