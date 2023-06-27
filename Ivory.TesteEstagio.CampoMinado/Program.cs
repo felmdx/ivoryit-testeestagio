@@ -11,7 +11,7 @@ namespace Ivory.TesteEstagio.CampoMinado
             Console.WriteLine(campoMinado.Tabuleiro);
 
             // Realize sua codificação a partir deste ponto, boa sorte!
-
+            
         }
     }
 }

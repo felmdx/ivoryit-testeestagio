@@ -1,0 +1,21 @@
+# Ideia de lógica
+
+    Enquanto statusJogo == 0:
+    Se percorrer todas as casas e abrir 1+ casa, repete***:
+        1. Percorrer de linha em linha, se chegar em um char diferente de '0' ou '-'
+            '1': Verifica casas abertas ao redor
+                Se tiver 1 casa fechada, marca como bomba
+                Se tiver 1 bomba marcada e outras casas fechadas, abre as casas
+                Se tiver mais de uma casa fechada, não faz nada
+            '2': casas abertas ao redor
+                Se tiver apenas 2 casas fechadas, marca como bomba
+                Se tiver 2 bombas marcadas e outras casas fechadas, abre as casas
+                Se tiver mais de duas casas fechadas, não faz nada
+            '2': casas abertas ao redor
+                Se tiver apenas 3 casas fechadas, marca como bomba
+                Se tiver 3 bombas marcadas e outras casas fechadas, abre as casas
+                Se tiver mais de duas casas fechadas, não faz nada
+    Se não, abre o primeiro '-' que aparecer e repete.
+
+    ***A cada casa aberta aumenta 1 na var casas_abertas e bombas_marcadas, se o valor for igual ant no inicio do loop
+        Abre o primeiro '-' que aparecer e repete. 
