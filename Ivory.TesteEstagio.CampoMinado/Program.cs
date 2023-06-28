@@ -4,93 +4,54 @@ namespace Ivory.TesteEstagio.CampoMinado
 {
     class Program
     {   
-        static int casasAbertasAtual = 21;
-        static int bombasMarcadasAtual = 0;
-        static int casasAbertasAnt = 0;
-        static int bombasMarcadasAnt = 0;
-        static int flag = 0;
-
         static void Main(string[] args)
         {
             var campoMinado = new CampoMinado();
-            Console.WriteLine("Início do jogo\n=========");
+            Console.WriteLine("Início do jogo\n===========");
             Console.WriteLine(campoMinado.Tabuleiro);
+            Console.WriteLine();
 
             // Realize sua codificação a partir deste ponto, boa sorte!
 
-            
+            int k = 0;
             int[,] campoMatriz = new int[9,9];
-            campoMatriz = Program.ConverteCampoMinado(campoMinado.Tabuleiro);
 
             while (campoMinado.JogoStatus == 0)
             {   
+                Console.WriteLine(k + " iteração:");
+                Console.WriteLine(campoMinado.Tabuleiro);
+                Console.WriteLine();
+                campoMatriz = verificaBombas(Program.ConverteCampoMinado(campoMinado.Tabuleiro));
+
                 int lin = campoMatriz.GetLength(0);
                 int col = campoMatriz.GetLength(1);
 
-                int[,] campoAux = new int[9,9];
-
-                if (Program.comparaCasaseBombas() == false)
+                for (int i = 0; i < lin; i++)
                 {
-                    flag = 1;
-                    for (int i = 0; i < lin; i++)
+                    for (int j = 0; j < col; j++)
                     {
-                        for (int j = 0; j < col; j++)
-                        {
-                            if (campoMatriz[i,j] == -1)
-                            {
-                                campoMinado.Abrir(i, j);
-                                campoAux = ConverteCampoMinado(campoMinado.Tabuleiro);
-                                campoMatriz[i, j] = campoAux[i, j];
-                            }
-                        }
+                        abreCasas(campoMinado, campoMatriz, i, j, campoMatriz[i,j]);
                     }
-                    flag = 0;
-
-                } else
-                {   
-                    flag = 1;
-                    bombasMarcadasAnt = bombasMarcadasAtual;
-                    casasAbertasAnt = casasAbertasAtual;
-
-                    for (int i = 0; i < lin; i++)
-                    {
-                        for (int j = 0; j < col; j++)
-                        {
-                            switch(campoMatriz[i,j])
-                            {
-                                case 1:
-                                    verificaCasas(campoMinado, campoMatriz, i, j, 1);
-                                    break;
-                                case 2:
-                                    verificaCasas(campoMinado, campoMatriz, i, j, 2);
-                                    break;
-                                case 3:
-                                    verificaCasas(campoMinado, campoMatriz, i, j, 3);
-                                    break;
-                                case 4:
-                                    verificaCasas(campoMinado, campoMatriz, i, j, 4);
-                                    break;
-                                case 5:
-                                    verificaCasas(campoMinado, campoMatriz, i, j, 5);
-                                    break;
-                                case 6:
-                                    verificaCasas(campoMinado, campoMatriz, i, j, 6);
-                                    break;
-                                case 7:
-                                    verificaCasas(campoMinado, campoMatriz, i, j, 7);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    }
-
-                    flag = 0;
-                    //contaZerosEbombas(campoMatriz);
+                
                 }
-
+                k++;
             }
-            if (campoMinado.JogoStatus == 1) Console.WriteLine("Nois");
+            if (campoMinado.JogoStatus == 1) 
+            {   
+                Console.WriteLine(k + " iteração:");
+                Console.WriteLine(campoMinado.Tabuleiro);
+                Console.WriteLine();
+                Console.WriteLine("Ganhamos :D");
+                Console.WriteLine("Fim de jogo \n==============");
+            }
+            else  
+            {   
+                Console.WriteLine(k + " iteração:");
+                Console.WriteLine(campoMinado.Tabuleiro);
+                Console.WriteLine();
+                Console.WriteLine("Perdemos :c");
+                Console.WriteLine("Fim de jogo \n==============");
+            }
         }
         
         // Função para converter a string em uma matriz, sendo -1 os espaços que não foram abertos ainda
@@ -137,56 +98,146 @@ namespace Ivory.TesteEstagio.CampoMinado
             }
         }
 
-        //Função que conta casas abertas
-        public static void contaZerosEbombas(int[,] campoMinado)
-        {
-            int linhas = campoMinado.GetLength(0);
-            int colunas = campoMinado.GetLength(1);
+        //Função que verifica quais casas são bombas e coloca "flag" chamada -2
+        public static int[,] verificaBombas(int[,] campoMatriz)
+        {   
+            int indicador = -10;
+            int linhas = campoMatriz.GetLength(0);
+            int colunas = campoMatriz.GetLength(1);
 
             for (int i = 0; i < linhas; i++)
             {
                 for (int j = 0; j < colunas; j++)
                 {
-                    if (campoMinado[i,j] == 0)
+                    indicador = campoMatriz[i,j];
+                    if (indicador >= 1)
                     {
-                        casasAbertasAtual++;
-                    }
-                    if (campoMinado[i,j] == -2)
-                    {
-                        bombasMarcadasAtual++;
+                        int contaCasas = 0;
+                        int[] iBomba = new int[8];
+                        int[] jBomba = new int[8];
+
+                        for (int y = 0; y < 8; y++)
+                        {
+                            iBomba[y] = -10;
+                        }
+                        for (int z = 0; z < 8; z++)
+                        {
+                            jBomba[z] = -10;
+                        }
+
+                        if (i > 0) 
+                        {
+                            if (campoMatriz[i - 1, j] == -1 || campoMatriz[i - 1, j] == -2 )
+                            {
+                                contaCasas++;
+                                iBomba[0] = i - 1;
+                                jBomba[0] = j;
+                            }
+                        }
+
+                        if (i < 8)
+                        {
+                            if (campoMatriz[i + 1, j] == -1 || campoMatriz[i + 1, j] == -2)
+                            {
+                                contaCasas++;
+                                iBomba[1] = i + 1;
+                                jBomba[1] = j;
+                            }
+                        }
+
+                        if (j > 0) 
+                        {
+                            if (campoMatriz[i, j - 1] == -1 || campoMatriz[i, j - 1] == -2)
+                            {
+                                contaCasas++;
+                                iBomba[2] = i;
+                                jBomba[2] = j - 1;
+                            }
+                        }
+
+                        if (j < 8)
+                        {
+                            if (campoMatriz[i, j + 1] == -1 || campoMatriz[i, j + 1] == -2)
+                            {
+                                contaCasas++;
+                                iBomba[3] = i;
+                                jBomba[3] = j + 1;
+                            }
+                        }
+
+                        if (i > 0 && j > 0)
+                        {
+                            if (campoMatriz[i - 1, j - 1] == -1 || campoMatriz[i - 1, j - 1] == -2)
+                            {
+                                contaCasas++;
+                                iBomba[4] = i - 1;
+                                jBomba[4] = j - 1;
+                            }
+                        }
+
+                        if (i > 0 && j < 8)
+                        {
+                            if (campoMatriz[i - 1, j + 1] == -1 || campoMatriz[i - 1, j + 1] == -2)
+                            {
+                                contaCasas++;
+                                iBomba[5] = i - 1;
+                                jBomba[5] = j + 1;
+                            }
+                        }
+
+                        if (i < 8 && j > 0)
+                        {
+                            if (campoMatriz[i + 1, j - 1] == -1 || campoMatriz[i + 1, j - 1] == -2)
+                            {
+                                contaCasas++;
+                                iBomba[6] = i + 1;
+                                jBomba[6] = j - 1;
+                            }
+                        }
+
+                        if (i < 8 && j < 8)
+                        {
+                            if (campoMatriz[i + 1, j + 1] == -1 || campoMatriz[i + 1, j + 1] == -2)
+                            {
+                                contaCasas++;
+                                iBomba[7] = i + 1;
+                                jBomba[7] = j + 1;
+                            }
+                        }
+
+                        if (contaCasas == indicador)
+                        {   
+                            for (int w = 0; w < 8; w++)
+                            {
+                                if (iBomba[w] != -10)
+                                {   
+                                    campoMatriz[iBomba[w], jBomba[w]] = -2;
+                                }
+                            }
+                        }
                     }
                 }
-                Console.WriteLine();
             }
+            return campoMatriz;
         }
 
-        //Função que verifica se vai iterar ou abrir outra casa
-        public static bool comparaCasaseBombas(){
-                if (flag == 0 && (casasAbertasAtual != casasAbertasAnt || bombasMarcadasAtual != bombasMarcadasAnt))
-                {
-                    return true;
-                } else
-                {
-                    return false;
-                }
-        }
 
-        //Função que verifica casas ao redor
-        public static void verificaCasas(CampoMinado campoMinado, int[,] campoMatriz, int i, int j, int indicador)
+        //Função que verifica casas que não são bomba e as abre no campo minado original
+        public static void abreCasas(CampoMinado campoMinado, int[,] campoMatriz, int i, int j, int indicador)
         {   
             int contaCasas = 0;
             int contaBombas = 0;
-            int[] iBomba = new int[8];
-            int[] jBomba = new int[8];
+            int[] iCasa = new int[8];
+            int[] jCasa = new int[8];
             int[,] campoAux = new int[9,9];
 
             for (int y = 0; y < 8; y++)
             {
-                iBomba[y] = 0;
+                iCasa[y] = 0;
             }
             for (int z = 0; z < 8; z++)
             {
-                jBomba[z] = 0;
+                jCasa[z] = 0;
             }
 
             if (i > 0) 
@@ -194,11 +245,13 @@ namespace Ivory.TesteEstagio.CampoMinado
                 if (campoMatriz[i - 1, j] == -1)
                 {
                     contaCasas++;
-                } else if (campoMatriz[i - 1, j] == -2 )
+                    iCasa[0] = i - 1;
+                    jCasa[0] = j;
+                } 
+                else if (campoMatriz[i - 1, j] == -2 )
                 {
+                    contaCasas++;
                     contaBombas++;
-                    iBomba[0] = i - 1;
-                    jBomba[0] = j;
                 }
             }
 
@@ -207,11 +260,13 @@ namespace Ivory.TesteEstagio.CampoMinado
                 if (campoMatriz[i + 1, j] == -1 && i < 8)
                 {
                     contaCasas++;
-                } else if (campoMatriz[i + 1, j] == -2 && i < 8)
-                {
+                    iCasa[1] = i + 1;
+                    jCasa[1] = j;
+                } 
+                else if (campoMatriz[i + 1, j] == -2 && i < 8)
+                {   
+                    contaCasas++;
                     contaBombas++;
-                    iBomba[1] = i + 1;
-                    jBomba[1] = j;
                 }
             }
 
@@ -220,11 +275,13 @@ namespace Ivory.TesteEstagio.CampoMinado
                 if (campoMatriz[i, j - 1] == -1)
                 {
                     contaCasas++;
-                } else if (campoMatriz[i, j - 1] == -2)
-                {
+                    iCasa[2] = i;
+                    jCasa[2] = j - 1;
+                } 
+                else if (campoMatriz[i, j - 1] == -2)
+                {   
+                    contaCasas++;
                     contaBombas++;
-                    iBomba[2] = i;
-                    jBomba[2] = j - 1;
                 }
             }
 
@@ -233,11 +290,13 @@ namespace Ivory.TesteEstagio.CampoMinado
                 if (campoMatriz[i, j + 1] == -1)
                 {
                     contaCasas++;
-                } else if (campoMatriz[i, j + 1] == -2)
-                {
+                    iCasa[3] = i;
+                    jCasa[3] = j + 1;
+                } 
+                else if (campoMatriz[i, j + 1] == -2)
+                {   
+                    contaCasas++;
                     contaBombas++;
-                    iBomba[3] = i;
-                    jBomba[3] = j + 1;
                 }
             }
 
@@ -246,11 +305,13 @@ namespace Ivory.TesteEstagio.CampoMinado
                 if (campoMatriz[i - 1, j - 1] == -1)
                 {
                     contaCasas++;
-                } else if (campoMatriz[i - 1, j - 1] == -2)
-                {
+                    iCasa[4] = i - 1;
+                    jCasa[4] = j - 1;
+                } 
+                else if (campoMatriz[i - 1, j - 1] == -2)
+                {   
+                    contaCasas++;
                     contaBombas++;
-                    iBomba[4] = i - 1;
-                    jBomba[4] = j - 1;
                 }
             }
 
@@ -259,11 +320,13 @@ namespace Ivory.TesteEstagio.CampoMinado
                 if (campoMatriz[i - 1, j + 1] == -1)
                 {
                     contaCasas++;
-                } else if (campoMatriz[i - 1, j + 1] == -2)
-                {
+                    iCasa[5] = i - 1;
+                    jCasa[5] = j + 1;
+                } 
+                else if (campoMatriz[i - 1, j + 1] == -2)
+                {   
+                    contaCasas++;
                     contaBombas++;
-                    iBomba[5] = i - 1;
-                    jBomba[5] = j + 1;
                 }
             }
 
@@ -272,11 +335,13 @@ namespace Ivory.TesteEstagio.CampoMinado
                 if (campoMatriz[i + 1, j - 1] == -1)
                 {
                     contaCasas++;
-                } else if (campoMatriz[i + 1, j - 1] == -2)
-                {
+                    iCasa[6] = i + 1;
+                    jCasa[6] = j - 1;
+                } 
+                else if (campoMatriz[i + 1, j - 1] == -2)
+                {   
+                    contaCasas++;
                     contaBombas++;
-                    iBomba[6] = i + 1;
-                    jBomba[6] = j - 1;
                 }
             }
 
@@ -285,49 +350,26 @@ namespace Ivory.TesteEstagio.CampoMinado
                 if (campoMatriz[i + 1, j + 1] == -1)
                 {
                     contaCasas++;
-                } else if (campoMatriz[i + 1, j + 1] == -2)
-                {
+                    iCasa[7] = i + 1;
+                    jCasa[7] = j + 1;
+                } 
+                else if (campoMatriz[i + 1, j + 1] == -2)
+                {   
+                    contaCasas++;
                     contaBombas++;
-                    iBomba[7] = i + 1;
-                    jBomba[7] = j + 1;
                 }
             }
-
-            if (contaCasas == indicador)
-            {
-                for (int w = 0; w < 8; w++)
-                {
-                    if (iBomba[w] != 0)
-                    {
-                        campoMatriz[iBomba[w], jBomba[w]] = -2;
-                        bombasMarcadasAtual++;
-                    }
-                }
-            }
-
-            Console.WriteLine(contaCasas);
-            Console.WriteLine(contaBombas);
-            Console.WriteLine();
-
-            if (contaBombas == indicador)
-            {
-                if (contaCasas > contaBombas)
-                {
+       
+            if (contaCasas > contaBombas && contaBombas == indicador)
+            {   
                     for (int w = 0; w < 8; w++)
                     {
-                        if (iBomba[w] == 0)
-                        {
-                            campoMinado.Abrir(iBomba[w], jBomba[w]);
-                            Console.WriteLine(campoMinado.Tabuleiro);
-                            Console.WriteLine();
-                            campoAux = ConverteCampoMinado(campoMinado.Tabuleiro);
-                            campoMatriz[iBomba[w], jBomba[w]] = campoAux[iBomba[w], jBomba[w]];
-                            casasAbertasAtual++;
+                        if (campoMatriz[iCasa[w], jCasa[w]] == -1)
+                        {   
+                            campoMinado.Abrir(iCasa[w] + 1, jCasa[w] + 1);
                         }
                     }
-                }
             }
-
         }
     }
 }
